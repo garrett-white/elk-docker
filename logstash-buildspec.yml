@@ -1,0 +1,18 @@
+version: 0.2
+
+env:
+  variables:
+    TEST_ENV: "test-variable"
+
+phases:
+  install:
+    commands:
+      - echo Installing updates...
+      - yum update -y
+      - cp elastic.repo /etc/yum.repos.d/elastic.repo
+      - yum install logstash -y
+      - systemctl enable logstash
+
+artifacts:
+  files:
+    - elastic.repo
