@@ -1,0 +1,15 @@
+version: '2.2'
+services:
+ elastalert:
+    build: ./
+    image: elastalert:latest
+    container_name: elastalert
+    restart: always
+    environment:
+      ES_HOST: es01
+      ES_PORT: 9200
+
+networks:
+  default:
+    external:
+      name: elk

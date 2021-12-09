@@ -1,0 +1,43 @@
+---
+- name: Create Kibana Shortcut
+  hosts: 127.0.0.1
+  connection: local
+  gather_facts: no
+  become: yes
+  become_method: sudo
+
+  tasks:
+
+  - name: Create desktop shortcut image
+    copy:
+      src: images/
+      dest: /usr/share/icons/
+
+  - name: Create Kibana desktop shortcut
+    copy:
+      dest: /home/analyst/Desktop/Kibana.desktop
+      content: |
+        [Desktop Entry]
+        Encoding=UTF-8
+        Name=Kibana
+        Type=Link
+        URL=http://127.0.0.1:5601
+        Icon=/usr/share/icons/kibana.png
+        Name[en_US]=Kibana
+
+  - name: Create ELK stack shortcut
+    copy:
+      dest: /home/analyst/Desktop/Run-ELK.desktop
+      owner: analyst
+      group: analyst
+      mode: '0755'
+      content: |
+        [Desktop Entry]
+        Name=Run-ELK
+        Type=Application
+        Terminal=true
+        StartupNotify=false
+        Categories=Application
+        Icon=/usr/share/icons/elastic.png
+        Exec=/opt/playbooks/elk-docker/run-elk.sh
+

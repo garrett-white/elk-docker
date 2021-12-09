@@ -1,0 +1,22 @@
+# This file is where you define your pipelines. You can define multiple.
+# For more information on multiple pipelines, see the documentation:
+#   https://www.elastic.co/guide/en/logstash/current/multiple-pipelines.html
+
+- pipeline.id: winlogbeat
+  path.config: "/usr/share/logstash/pipeline/winlogbeat"
+- pipeline.id: filebeat
+  path.config: "/usr/share/logstash/pipeline/filebeat"
+#- pipeline.id: packetbeat
+#  path.config: "/usr/share/logstash/pipeline/packetbeat"
+#- pipeline.id: elk-logs
+#  path.config: "/usr/share/logstash/pipeline/elk-logs"
+#- pipeline.id: splunk
+#  path.config: "/usr/share/logstash/pipeline/splunk"
+#- pipeline.id: nxlog
+#  path.config: "/usr/share/logstash/pipeline/nxlog"
+#- pipeline.id: mordor-logs
+#  path.config: "/usr/share/logstash/pipeline/mordor-logs"
+#- pipeline.id: ad-enrichment
+#  path.config: "/usr/share/logstash/pipeline/ad-enrichment"
+#- pipeline.id: snmp
+#  path.config: "/usr/share/logstash/pipeline/snmp"

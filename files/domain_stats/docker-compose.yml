@@ -1,0 +1,11 @@
+version: '2.2'
+services:
+ domain_stats:
+    image: hasecuritysolutions/domain_stats
+    container_name: domain_stats
+    restart: always
+
+networks:
+  default:
+    external:
+      name: elk

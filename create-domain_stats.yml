@@ -1,0 +1,21 @@
+---
+- name: Update ELK Containers
+  hosts: 127.0.0.1
+  connection: local
+  gather_facts: no
+  become: yes
+  become_method: sudo
+
+  tasks:
+
+  - name: Copy domain_stats logstash filter
+    copy:
+      src: ./files/domain_stats/20-filter.conf
+      dest: /opt/elk-siem/logstash/pipeline/packetbeat/
+      remote_src: no
+
+  - name: docker-compose up
+    docker_compose:
+      project_src: /opt/elk-siem/domain_stats
+      build: yes
+      state: present

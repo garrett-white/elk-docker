@@ -1,0 +1,15 @@
+---
+- name: Copy profile
+  hosts: 127.0.0.1
+  connection: local
+  gather_facts: no
+  become: yes
+  become_method: sudo
+
+  tasks:
+
+  - name: Copy .profile to /home/analyst, to git pull updates
+    copy:
+      src: ./.profile
+      dest: /home/analyst
+      mode: preserve

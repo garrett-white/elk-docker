@@ -1,0 +1,14 @@
+alert:
+- debug
+description: Detects long command lines from sysmon
+
+filter:
+- query:
+    query_string:
+      query: "CommandLine.length: >500"
+index: logstash-winlogbeat-sysmon-*
+name: Suspicious-Long-Command
+priority: 2
+realert:
+  minutes: 0
+type: any

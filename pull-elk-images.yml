@@ -1,0 +1,37 @@
+---
+- name: Pull ELK Images
+  hosts: 127.0.0.1
+  connection: local
+  gather_facts: no
+  become: yes
+  become_method: sudo
+
+  tasks:
+
+  - name: Elasticsearch docker image
+    docker_image:
+      name: docker.elastic.co/elasticsearch/elasticsearch:7.13.0
+      source: pull
+
+  - name: Kibana docker image
+    docker_image:
+      name: docker.elastic.co/kibana/kibana:7.13.0
+      source: pull
+
+  - name: Logstash docker image
+    docker_image:
+      name: docker.elastic.co/logstash/logstash:7.13.0
+      source: pull
+
+#  - name: Elastalert docker image
+#    docker_image:
+#      name: elastalert:latest
+#      build:
+#        path: /opt/elk-siem/elastalert/
+#        pull: yes
+#      source: build
+
+#  - name: Domain_stats docker image
+#    docker_image:
+#      name: hasecuritysolutions/domain_stats
+#      source: pull

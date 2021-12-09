@@ -1,0 +1,55 @@
+---
+- name: Copy profile
+  hosts: 127.0.0.1
+  connection: local
+  gather_facts: no
+  become: yes
+  become_method: sudo
+
+  tasks:
+
+  - name: Make sure workshop materials repo exists
+    git:
+      repo: 'https://github.com/cyberguerrilla/workshop_materials.git'
+      dest: /opt/workshop_materials
+
+  - name: Add aliases
+    blockinfile:
+      path: "{{ item.path }}"
+      content: |
+        alias containers='docker ps -a --format "table{{ '{{' }}.Names}}\t{{ '{{' }}.Image}}\t{{ '{{' }}.Ports}}\t{{ '{{' }}.Status}}"'
+        alias start-elk="docker-compose -f /opt/elk-siem/docker-compose.yml up -d --no-deps --build" 
+        alias stop-elk="docker-compose -f /opt/elk-siem/docker-compose.yml stop" 
+        alias start-osquery="docker-compose -f /opt/kolide/docker-compose.yml up -d --no-deps --build" 
+        alias stop-osquery="docker-compose -f /opt/kolide/docker-compose.yml stop" 
+        alias elastalert="docker exec -it elastalert /bin/sh" 
+        alias start-elastalert="docker-compose -f /opt/elk-siem/docker-compose.yml up -d --no-deps --build elastalert" 
+        alias stop-elastalert="docker-compose -f /opt/elk-siem/docker-compose.yml stop elastalert" 
+        alias logstash="docker exec -it logstash /bin/sh" 
+        alias start-logstash="docker-compose -f /opt/elk-siem/docker-compose.yml up -d --no-deps --build logstash" 
+        alias stop-logstash="docker-compose -f /opt/elk-siem/docker-compose.yml stop logstash" 
+        alias domain_stats="docker exec -it domain_stats /bin/sh" 
+        alias start-domain_stats="docker-compose -f /opt/elk-siem/docker-compose.yml up -d --no-deps --build domain_stats" 
+        alias stop-domain_stats="docker-compose -f /opt/elk-siem/docker-compose.yml stop domain_stats" 
+        alias kibana="docker exec -it kibana /bin/sh" 
+        alias start-kibana="docker-compose -f /opt/elk-siem/docker-compose.yml up -d --no-deps --build kibana" 
+        alias stop-kibana="docker-compose -f /opt/elk-siem/docker-compose.yml stop kibana" 
+        alias es01="docker exec -it es01 /bin/sh" 
+        alias start-es01="docker-compose -f /opt/elk-siem/docker-compose.yml up -d --no-deps --build es01" 
+        alias stop-es01="docker-compose -f /opt/elk-siem/docker-compose.yml stop es01" 
+        alias fleet="docker exec -it fleet /bin/sh" 
+        alias start-fleet="docker-compose -f /opt/kolide/docker-compose.yml up -d --no-deps --build fleet" 
+        alias stop-fleet="docker-compose -f /opt/kolide/docker-compose.yml stop fleet" 
+        alias mailhog="docker exec -it mailhog /bin/sh" 
+        alias start-mailhog="docker-compose -f /opt/kolide/docker-compose.yml up -d --no-deps --build mailhog" 
+        alias stop-mailhog="docker-compose -f /opt/kolide/docker-compose.yml stop mailhog" 
+        alias mysql="docker exec -it mysql /bin/sh" 
+        alias start-mysql="docker-compose -f /opt/kolide/docker-compose.yml up -d --no-deps --build mysql" 
+        alias stop-mysql="docker-compose -f /opt/kolide/docker-compose.yml stop mysql" 
+        alias redis="docker exec -it redis /bin/sh" 
+        alias start-redis="docker-compose -f /opt/kolide/docker-compose.yml up -d --no-deps --build redis" 
+        alias stop-redis="docker-compose -f /opt/kolide/docker-compose.yml stop redis"
+        alias update-workshop="pushd /opt/workshop_materials/ && sudo git pull && popd" 
+    with_items: 
+      - { path: '/root/.bashrc' } 
+      - { path: '/home/analyst/.bashrc' } 

@@ -1,0 +1,15 @@
+---
+- name: Update ELK Containers
+  hosts: 127.0.0.1
+  connection: local
+  gather_facts: no
+  become: yes
+  become_method: sudo
+
+  tasks:
+
+  - name: docker-compose up
+    docker_compose:
+      project_src: /opt/elk-siem/elastalert
+      build: yes
+      state: present
