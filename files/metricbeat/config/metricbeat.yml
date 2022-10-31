@@ -1,0 +1,26 @@
+metricbeat.config:
+  modules:
+    path: ${path.config}/modules.d/*.yml.nomodules
+    # Reload module configs as they change:
+    reload.enabled: true
+
+metricbeat.modules:
+- module: system
+  enabled: false
+    
+- module: logstash
+  metricsets: ["node", "node_stats"]
+  enabled: true
+  period: 10s
+  hosts: ["logstash:9600"]
+  xpack.enabled: true
+
+#setup.template.settings:
+#  index:
+#    number_of_shards: 1
+#    number_of_replicas: 0
+
+output.elasticsearch:
+  hosts: "http://es01:9200"
+  username: elastic
+  password: ${ELASTIC_PASSWORD}

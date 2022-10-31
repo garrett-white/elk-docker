@@ -1,14 +1,21 @@
 version: '2.2'
 services:
   es01:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.13.0
+    image: elasticsearch:8.3.3
     container_name: es01
     environment:
       - node.name=es01
       - cluster.name=docker-cluster
-      - discovery.zen.minimum_master_nodes=1
       - discovery.type=single-node
+      - xpack.security.enabled=true
+      - xpack.security.authc.api_key.enabled=true
       - xpack.monitoring.collection.enabled=true
+      - xpack.security.http.ssl.enabled=false
+      - xpack.security.transport.ssl.enabled=false
+      - xpack.license.self_generated.type=basic
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - KIBANA_PASSWORD=${KIBANA_PASSWORD}
+      - LOGSTASH_PASSWORD=${LOGSTASH_PASSWORD}
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
     ulimits:
@@ -18,20 +25,28 @@ services:
     restart: always
     volumes:
       - esdata01:/usr/share/elasticsearch/data
-      # - ./elasticsearch/scripts:/usr/share/elasticsearch/scripts
-    # entrypoint: /usr/share/elasticsearch/scripts/es-entrypoint.sh
+      - ./elasticsearch/scripts:/usr/share/elasticsearch/scripts
+    entrypoint: /usr/share/elasticsearch/scripts/es-entrypoint.sh
     ports:
       - 9200:9200
     networks:
       - elk
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:7.13.0
+    image: kibana:8.3.3
     container_name: kibana
     hostname: kibana
     environment:
+      - KIBANA_PASSWORD=${KIBANA_PASSWORD}
       - ELASTICSEARCH_HOSTS=http://es01:9200
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
       - XPACK_MONITORING_ENABLED=true
+      - XPACK_SECURITY_ENABLED=true
+      - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      - XPACK_SECURITY_ENCRYPTIONKEY=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    volumes:
+      - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
     restart: always
     ports:
       - 5601:5601
@@ -39,11 +54,12 @@ services:
       - elk
 
   logstash:
-    image: docker.elastic.co/logstash/logstash:7.13.0
+    image: logstash:8.3.3
     container_name: logstash
     hostname: logstash
     environment:
       - "LS_JAVA_OPTS=-Xmx1g -Xms1g"
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}  
     volumes:
       - ./logstash/config:/usr/share/logstash/config
       - ./logstash/pipeline:/usr/share/logstash/pipeline
@@ -51,8 +67,49 @@ services:
       # - ./logstash/scripts:/usr/share/logstash/scripts
     ports:
       - "5000-5100:5000-5100"
+      - 9600:9600
     restart: always
+    healthcheck:  
+      test: curl -f http://localhost:9600 || exit 1  
     # entrypoint: /usr/share/logstash/scripts/ls-entrypoint.sh
+    networks:
+      - elk
+
+  metricbeat:
+    image: elastic/metricbeat:8.3.3
+    container_name: metricbeat
+    hostname: metricbeat
+    environment:
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+    volumes:
+      - ./metricbeat/config/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml 
+    restart: always
+    depends_on:
+      logstash:
+        condition: service_healthy
+    networks:
+      - elk
+
+  fleet:
+    image: elastic/elastic-agent:8.3.3
+    container_name: fleet
+    hostname: fleet
+    environment: 
+      - FLEET_SERVER_ENABLE=1
+      - FLEET_SERVER_ELASTICSEARCH_HOST=http://es01:9200  
+      - FLEET_SERVER_INSECURE_HTTP=true
+      - FLEET_SERVER_POLICY_ID=fleet-server-policy
+      - FLEET_INSECURE=true 
+      - KIBANA_FLEET_SETUP=1
+      - KIBANA_FLEET_HOST=http://kibana:5601
+      - KIBANA_FLEET_USERNAME=elastic
+      - KIBANA_FLEET_PASSWORD=${ELASTIC_PASSWORD}
+    ports:
+      - 8220:8220
+    restart: always
+    depends_on:
+      - es01
+      - kibana
     networks:
       - elk
 

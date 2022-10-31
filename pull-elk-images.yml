@@ -10,17 +10,22 @@
 
   - name: Elasticsearch docker image
     docker_image:
-      name: docker.elastic.co/elasticsearch/elasticsearch:7.13.0
+      name: elasticsearch:8.3.3
       source: pull
 
   - name: Kibana docker image
     docker_image:
-      name: docker.elastic.co/kibana/kibana:7.13.0
+      name: kibana:8.3.3
       source: pull
 
   - name: Logstash docker image
     docker_image:
-      name: docker.elastic.co/logstash/logstash:7.13.0
+      name: logstash:8.3.3
+      source: pull
+
+  - name: Metricbeat docker image
+    docker_image:
+      name: elastic/metricbeat:8.3.3
       source: pull
 
 #  - name: Elastalert docker image

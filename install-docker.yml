@@ -2,7 +2,7 @@
 - name: Install Docker
   hosts: 127.0.0.1
   connection: local
-  gather_facts: no
+  gather_facts: yes
   become: yes
   become_method: sudo
 
@@ -27,12 +27,13 @@
  
   - name: Add Docker GPG key.
     apt_key:
-      key: https://download.docker.com/linux/debian/gpg
+      url: https://download.docker.com/linux/debian/gpg
+      id: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
       state: present
   
   - name: Add Docker repository.
     apt_repository:
-      repo: https://download.docker.com/linux/debian focal stable
+      repo: deb https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable
       state: present
       update_cache: true
 
@@ -51,3 +52,6 @@
       state: started
       enabled: true
 
+  - name: pip docker
+    pip:
+      name: docker
