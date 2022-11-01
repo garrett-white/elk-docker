@@ -1,0 +1,95 @@
+server.host: "0.0.0.0"
+server.shutdownTimeout: "5s"
+monitoring.ui.container.elasticsearch.enabled: true
+
+## Fleet
+## https://www.elastic.co/guide/en/kibana/current/fleet-settings-kb.html
+#
+xpack.fleet.agents.fleet_server.hosts: [ 'http://192.168.79.128:8220' ]
+xpack.fleet.agents.elasticsearch.hosts: [ 'http://192.168.79.128:9200' ]
+
+xpack.fleet.packages:
+  - name: fleet_server
+    version: latest
+  - name: system
+    version: latest
+  - name: elastic_agent
+    version: latest
+  - name: endpoint
+    version: latest
+
+xpack.fleet.agentPolicies:
+  - name: Fleet Server policy
+    id: fleet-server-policy
+    description: Fleet Server policy
+    monitoring_enabled:
+      - logs
+      - metrics
+    package_policies:
+      - name: fleet_server-1
+        package:
+          name: fleet_server
+      - name: system-1
+        package:
+          name: system
+      - name: elastic_agent-1
+        package:
+          name: elastic_agent
+  - name: windows policy
+    id: windows-policy
+    description: windows endpoint security policy
+    monitoring_enabled:
+      - logs
+      - metrics
+    package_policies:
+      - id: endpoint-security          
+        package:
+          name: endpoint
+        name: endpoint-security
+        inputs:
+          - type: endpoint
+            enabled: true
+            vars:
+              - name: policy
+                value:
+                  windows:
+                    events:
+                      dll_and_driver_load: true
+                      dns: true
+                      file: true
+                      network: true
+                      process: true
+                      registry: true
+                      security: true
+                    malware:
+                      mode: prevent
+                      blocklist: true
+                    ransomware:
+                      mode: 'off'
+                      supported: false
+                    memory_protection:
+                      mode: 'off'
+                      supported: false
+                    behavior_protection:
+                      mode: 'off'
+                      supported: false
+                    popup:
+                      malware:
+                        enabled: true
+                        message: ''
+                      ransomware:
+                        enabled: false
+                        message: ''
+                      memory_protection:
+                        enabled: false
+                        message: ''
+                      behavior_protection:
+                        enabled: false
+                        message: ''
+                    logging:
+                      file: info
+                    antivirus_registration:
+                      enabled: false
+                    attack_surface_reduction:
+                      credential_hardening:
+                        enabled: false

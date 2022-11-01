@@ -4,6 +4,8 @@
 
 # /usr/share/elasticsearch/scripts/es-index-templates.sh &
 
-/usr/share/elasticsearch/scripts/es-set-password-template.sh &
+/usr/share/elasticsearch/scripts/es-set-password-and-replicas.sh &
+
+/usr/share/elasticsearch/scripts/fleet-add-integration.sh &
 
 /usr/local/bin/docker-entrypoint.sh

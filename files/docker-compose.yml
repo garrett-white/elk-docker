@@ -1,11 +1,12 @@
 version: '2.2'
 services:
   es01:
-    image: elasticsearch:${ELASTIC_VERSION}
+    image: elastic/elasticsearch:${ELASTIC_VERSION}
     container_name: es01
+    hostname: es01
     environment:
       - node.name=es01
-      - cluster.name=docker-cluster
+      - cluster.name=atd-elk
       - discovery.type=single-node
       - xpack.security.enabled=true
       - xpack.security.authc.api_key.enabled=true
@@ -17,7 +18,7 @@ services:
       - KIBANA_PASSWORD=${KIBANA_PASSWORD}
       - LOGSTASH_PASSWORD=${LOGSTASH_PASSWORD}
       - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+      - ES_JAVA_OPTS=${ES_JVM}
     ulimits:
       memlock:
         soft: -1
@@ -33,7 +34,7 @@ services:
       - elk
 
   kibana:
-    image: kibana:${ELASTIC_VERSION}
+    image: elastic/kibana:${ELASTIC_VERSION}
     container_name: kibana
     hostname: kibana
     environment:
@@ -49,17 +50,19 @@ services:
     volumes:
       - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
     restart: always
+    healthcheck:
+      test: curl -f http://localhost:5601 || exit 1   
     ports:
       - 5601:5601
     networks:
       - elk
 
   logstash:
-    image: logstash:${ELASTIC_VERSION}
+    image: elastic/logstash:${LOGSTASH_VERSION}
     container_name: logstash
     hostname: logstash
     environment:
-      - "LS_JAVA_OPTS=-Xmx1g -Xms1g"
+      - LS_JAVA_OPTS=${LS_JVM}
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}  
     volumes:
       - ./logstash/config:/usr/share/logstash/config
@@ -109,8 +112,8 @@ services:
       - 8220:8220
     restart: always
     depends_on:
-      - es01
-      - kibana
+      kibana:
+        condition: service_healthy
     networks:
       - elk
 

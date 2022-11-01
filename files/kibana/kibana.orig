@@ -43,6 +43,10 @@ xpack.fleet.agentPolicies:
       - metrics
     package_policies:
       - package:
+          name: endpoint
+        name: endpoint-security
+        id: endpoint-security          
+      - package:
           name: system
         name: system-2
         id: system-windows
